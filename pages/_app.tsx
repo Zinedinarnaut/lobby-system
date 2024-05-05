@@ -20,14 +20,14 @@ export default function App({ Component, pageProps: { session, ...pageProps }, }
             options={{
               showSpinner: true,
             }}
-            color="#F472B6"
+            color="#E3B914"
             startPosition={0.1}
             stopDelayMs={100}
             height={3}
-            showOnShallow={false}
+            showOnShallow={true}
         />
 
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <Component {...pageProps} />
         </ThemeProvider>
         <Toaster richColors theme="dark" closeButton />

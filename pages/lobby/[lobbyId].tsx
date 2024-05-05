@@ -1,8 +1,7 @@
 import { useRouter } from 'next/router';
-import React, { SVGProps, useEffect, useState } from 'react';
+import {SVGProps, useEffect, useState} from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 interface Lobby {
     name: string;
@@ -23,7 +22,6 @@ const LobbyPage: React.FC = () => {
     const [messageText, setMessageText] = useState('');
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [lobbyActive, setLobbyActive] = useState(true); // Track lobby activity
-    const [isConnected, setIsConnected] = useState(false); // Track WebSocket connection status
 
     useEffect(() => {
         let socketInstance: WebSocket;
@@ -32,8 +30,7 @@ const LobbyPage: React.FC = () => {
             socketInstance = new WebSocket('ws://localhost:8080');
 
             socketInstance.onopen = () => {
-                toast.success('WebSocket connection established');
-                setIsConnected(true); // Set the connection status to true when connected
+                console.log('WebSocket connection established');
                 // Send a message to the server to join the lobby
                 socketInstance.send(JSON.stringify({ type: 'join_lobby', lobbyName: lobbyId }));
             };
@@ -57,11 +54,7 @@ const LobbyPage: React.FC = () => {
             socketInstance.onclose = () => {
                 // Handle unexpected closure (e.g., host refresh or leave)
                 setLobbyActive(true);
-                setIsConnected(false); // Set the connection status to false when disconnected
             };
-
-            // Set the socket state
-            setSocket(socketInstance);
         };
 
         establishConnection();
@@ -71,39 +64,28 @@ const LobbyPage: React.FC = () => {
             event.preventDefault();
             event.returnValue = '';
             setLobbyActive(false);
+            socketInstance.onclose = () => {
+                // Handle unexpected closure (e.g., host refresh or leave)
+                setLobbyActive(true);
+            };
         };
 
         window.addEventListener('beforeunload', handleRefresh);
 
         return () => {
-            if (socketInstance && isConnected) {
-                // Send a message to the server indicating leaving the lobby
-                socketInstance.send(JSON.stringify({ type: 'leave_lobby' }));
-            }
             if (socketInstance) {
-                // Close the WebSocket connection
                 socketInstance.close();
-                toast.warning('WebSocket connection closed');
+                console.log('WebSocket connection closed');
             }
             window.removeEventListener('beforeunload', handleRefresh);
         };
-    }, [lobbyId, isConnected]);
+    }, [lobbyId]);
 
     const sendMessage = () => {
-        if (messageText.trim() !== '' && socket && isConnected) {
+        if (messageText.trim() !== '' && socket) {
             // Send the message to the server
             socket.send(JSON.stringify({ type: 'send_message', message: messageText }));
             setMessageText('');
-        }
-    };
-
-    const leaveLobby = () => {
-        if (socket && isConnected) {
-            // Send a message to the server indicating leaving the lobby
-            socket.send(JSON.stringify({ type: 'leave_lobby' }));
-            // Close the WebSocket connection
-            socket.close();
-            toast.warning('Left the lobby');
         }
     };
 
@@ -114,8 +96,8 @@ const LobbyPage: React.FC = () => {
     return (
         <>
             {!lobbyActive && (
-                <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-[#0e0e0f]">
-                    <div className="rounded bg-white p-8 shadow-md dark:bg-gray-800">
+                <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
+                    <div className="rounded-lg bg-white p-8 shadow-md dark:bg-gray-800">
                         <div className="space-y-4 text-center">
                             <TriangleAlertIcon className="mx-auto h-8 w-8 text-yellow-500" />
                             <h2 className="text-2xl font-bold">The lobby has been closed</h2>
@@ -143,7 +125,7 @@ const LobbyPage: React.FC = () => {
                                     <p>Max Players: {lobby.maxPlayers}</p>
                                     {/* Display messages */}
                                     {messages.map(message => (
-                                        <div key={message.id} className="bg-gray-200 p-2 rounded-lg">
+                                        <div key={message.id} className="bg-gray-200 p-2 rounded">
                                             {message.text}
                                         </div>
                                     ))}
@@ -157,7 +139,6 @@ const LobbyPage: React.FC = () => {
                                     onChange={(e) => setMessageText(e.target.value)}
                                 />
                                 <Button onClick={sendMessage}>Send</Button>
-                                <Button onClick={leaveLobby}>Leave Lobby</Button>
                             </div>
                         </div>
                     </div>
