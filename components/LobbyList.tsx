@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/router';
 import {toast} from "sonner";
+import {Meteors} from "@/components/magicui/Metors";
+import {Boxes} from "@/components/magicui/background-boxes";
 
 interface Lobby {
     name: string;
@@ -83,7 +85,7 @@ const LobbyList: React.FC<Props> = ({ lobbies }) => {
             <h2 className="mb-4 text-2xl font-bold">Existing Lobbies</h2>
             <div className="space-y-4">
                 {lobbies.map((lobby, index) => (
-                    <div key={index} className="flex items-center justify-between rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
+                    <div key={index} className="flex items-center justify-between rounded bg-gray-100 p-4 dark:bg-gray-800">
                         <div>
                             <h3 className="text-lg font-medium">{lobby.name}</h3>
                             <p className="text-gray-500 dark:text-gray-400">{lobby.players}/{lobby.maxPlayers} users</p>
