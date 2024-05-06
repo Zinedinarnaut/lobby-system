@@ -5,8 +5,10 @@ import LobbyForm from '@/components/LobbyForm';
 import {toast} from "sonner";
 import Link from 'next/link';
 import {Button} from "@/components/ui/button";
-import {Boxes} from "@/components/magicui/background-boxes";
-import {cn} from "@/lib/utils";
+import { DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem, DropdownMenuContent, DropdownMenu } from "@/components/ui/dropdown-menu"
+import Image from "next/image";
+
+import MountainIcon from "@/components/MountainIcon"
 
 interface Lobby {
   name: string;
@@ -120,6 +122,67 @@ const IndexPage: React.FC = () => {
 
   return (
       <>
+        <header className="flex h-16 w-full items-center justify-between px-4 md:px-6">
+          <div className="flex items-center gap-4">
+            <Link className="flex items-center gap-2 text-lg font-semibold" href="#">
+              <MountainIcon className="h-6 w-6"/>
+              <span className="sr-only">Acme Inc</span>
+            </Link>
+            <nav className="hidden gap-6 text-sm font-medium md:flex">
+              <Link className="hover:underline hover:underline-offset-4" href="#">
+                Home
+              </Link>
+              <Link className="hover:underline hover:underline-offset-4" href="#">
+                Products
+              </Link>
+              <Link className="hover:underline hover:underline-offset-4" href="#">
+                Pricing
+              </Link>
+              <Link className="hover:underline hover:underline-offset-4" href="#">
+                About
+              </Link>
+              <Link className="hover:underline hover:underline-offset-4" href="#">
+                Contact
+              </Link>
+            </nav>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="rounded-full" size="icon" variant="ghost">
+                <Image
+                    alt="Avatar"
+                    className="rounded-full"
+                    height="32"
+                    quality={100}
+                    src="https://proclad-construction.vercel.app/api/v1/avatar/1"
+                    style={{
+                      aspectRatio: "32/32",
+                      objectFit: "cover",
+                    }}
+                    width="32"
+                />
+                <span className="sr-only">Toggle user menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Signed in as</DropdownMenuLabel>
+              <DropdownMenuSeparator/>
+              <DropdownMenuItem>
+                <Link href="#">Your Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="#">Settings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="/privacy-policy">Privacy Policy</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator/>
+              <DropdownMenuItem>
+                <Link href="#">Login in</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
         <main className="flex min-h-screen w-full flex-col items-center justify-center py-12">
           <div className="container mx-auto max-w-5xl px-4 md:px-6">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
@@ -145,8 +208,8 @@ const IndexPage: React.FC = () => {
             </Button>
           </div>
           <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-            <Link className="text-xs hover:underline underline-offset-4" href="/status">
-              Project Statues
+            <Link className="text-xs hover:underline underline-offset-4" href="/privacy-policy">
+              Privacy Policy
             </Link>
           </nav>
         </footer>

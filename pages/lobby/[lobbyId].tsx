@@ -3,6 +3,7 @@ import React, {SVGProps, useEffect, useState} from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import {BarLoader} from "react-spinners";
 
 interface Lobby {
     name: string;
@@ -108,7 +109,9 @@ const LobbyPage: React.FC = () => {
     }, []);
 
     if (!lobby) {
-        return <div>Loading...</div>;
+        return <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-transparent">
+            <BarLoader color="#E3B914" />
+        </div>;
     }
 
     return (
@@ -176,8 +179,8 @@ const LobbyPage: React.FC = () => {
                     </Button>
                 </div>
                 <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-                    <Link className="text-xs hover:underline underline-offset-4" href="/status">
-                        Project Statues
+                    <Link className="text-xs hover:underline underline-offset-4" href="/privacy-policy">
+                        Privacy Policy
                     </Link>
                 </nav>
             </footer>

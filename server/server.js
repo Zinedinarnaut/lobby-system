@@ -1,8 +1,31 @@
 const WebSocket = require('ws');
+const axios = require('axios');
 
 const wss = new WebSocket.Server({ port: 8080 });
 
 const lobbies = [];
+
+const discordWebhookUrl = 'https://discord.com/api/webhooks/1232250462921818142/KawJWWUiV0W4UOeRCVzRGojpC7XTwgODfwnhmYdQr1L5GashdEScjDNwJx4NEEFI-jhw';
+
+// Function to log messages to Discord webhook
+function logToDiscord(message, retries = 3) {
+    axios.post(discordWebhookUrl, {
+        content: message
+    }).then(() => {
+        console.log('Message logged to Discord webhook');
+    }).catch((error) => {
+        console.error('Error logging message to Discord webhook:', error);
+        if (retries > 0) {
+            // Retry logging
+            setTimeout(() => {
+                logToDiscord(message, retries - 1);
+            }, 5000); // Retry after 5 seconds
+        } else {
+            console.error('Maximum retry limit reached. Unable to log message to Discord webhook.');
+        }
+    });
+}
+
 
 wss.on('connection', (ws) => {
     const userId = generateUserId(); // Generate a unique user ID for each client connection
@@ -11,6 +34,7 @@ wss.on('connection', (ws) => {
 
     ws.on('message', (message) => {
         const data = JSON.parse(message.toString());
+        logToDiscord(`Received message from client: ${JSON.stringify(data)}`);
         switch (data.type) {
             case 'create_lobby':
                 // Handle lobby creation
@@ -55,7 +79,7 @@ wss.on('connection', (ws) => {
                         if (lobbies[lobbyIndex].players <= 0) {
                             // If no more players in the lobby, remove the lobby
                             lobbies.splice(lobbyIndex, 1);
-                            console.log(`Lobby ${lobbyName} removed due to no players.`);
+                            logToDiscord(`Lobby ${lobbyName} removed due to no players.`);
                             lobbyName = null; // Reset lobby name for the client
                         }
                         // Broadcast updated lobby list to all clients
@@ -103,7 +127,7 @@ wss.on('connection', (ws) => {
                 }
                 break;
             case 'other_message_type':
-                console.log('Received other message:', data);
+                logToDiscord('Received other message:', data);
                 // Handle other types of messages accordingly
                 if (data.hasOwnProperty('someCondition')) {
                     // Check if the property exists
@@ -142,7 +166,7 @@ wss.on('connection', (ws) => {
     });
 
     ws.on('close', () => {
-        console.log('Client disconnected');
+        logToDiscord('Client disconnected');
         // Handle client disconnection
         if (lobbyName) {
             const lobbyIndex = lobbies.findIndex((lobby) => lobby.name === lobbyName);
@@ -154,7 +178,7 @@ wss.on('connection', (ws) => {
                 if (lobbies[lobbyIndex].players <= 0) {
                     // If no more players in the lobby, remove the lobby
                     lobbies.splice(lobbyIndex, 1);
-                    console.log(`Lobby ${lobbyName} removed due to no players.`);
+                    logToDiscord(`Lobby ${lobbyName} removed due to no players.`);
                 }
                 // Broadcast updated lobby list to all clients
                 broadcastLobbyList();
@@ -192,4 +216,5 @@ wss.on('connection', (ws) => {
     }
 });
 
-console.log('WebSocket server started on port 8080');
+console.log('WebSocket server started on port 8080')
+logToDiscord('WebSocket server started on port 8080');
