@@ -18,7 +18,7 @@ export default function privacyPolicy() {
         <>
             <header className="flex h-16 w-full items-center justify-between px-4 md:px-6">
                 <div className="flex items-center gap-4">
-                    <Link className="flex items-center gap-2 text-lg font-semibold" href="#">
+                    <Link className="flex items-center gap-2 text-lg font-semibold" href="/">
                         <MountainIcon className="h-6 w-6"/>
                         <span className="sr-only">Acme Inc</span>
                     </Link>
@@ -35,8 +35,8 @@ export default function privacyPolicy() {
                         <Link className="hover:underline hover:underline-offset-4" href="#">
                             About
                         </Link>
-                        <Link className="hover:underline hover:underline-offset-4" href="#">
-                            Contact
+                        <Link className="hover:underline hover:underline-offset-4" href="/privacy-policy">
+                            Privacy Policy
                         </Link>
                     </nav>
                 </div>
