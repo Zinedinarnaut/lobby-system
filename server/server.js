@@ -202,6 +202,7 @@ wss.on('connection', (ws) => {
     }
 
     // Function to broadcast updated lobby message list to all clients in the lobby
+// Function to broadcast updated lobby message list to all clients in the lobby
     function broadcastLobbyMessages(lobbyName) {
         const lobbyIndex = lobbies.findIndex((lobby) => lobby.name === lobbyName);
         if (lobbyIndex !== -1) {

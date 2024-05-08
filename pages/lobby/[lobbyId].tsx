@@ -1,14 +1,21 @@
 import { useRouter } from 'next/router';
-import React, {SVGProps, useEffect, useState} from 'react';
+import React, { SVGProps, useEffect, useState } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {BarLoader} from "react-spinners";
+import { BarLoader } from "react-spinners";
+
+import MessageDisplay from "@/components/MessageDisplay";
+
+import Board from '@/components/Board'
+import Chess from '@/components/chess/Chess';
 
 interface Lobby {
     name: string;
     players: number;
     maxPlayers: number;
+    playerIds: string[]; // Array of player IDs
+    messages: Message[]; // Add messages property
 }
 
 interface Message {
@@ -25,6 +32,7 @@ const LobbyPage: React.FC = () => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [lobbyActive, setLobbyActive] = useState(true); // Track lobby activity
     const [latestVersion, setLatestVersion] = useState<string | null>(null);
+    const [selectedGame, setSelectedGame] = useState<string>('ticTacToe'); // Default selected game
 
     useEffect(() => {
         let socketInstance: WebSocket;
@@ -114,6 +122,10 @@ const LobbyPage: React.FC = () => {
         </div>;
     }
 
+    const handleGameChange = (game: string) => {
+        setSelectedGame(game);
+    };
+
     return (
         <>
             {!lobbyActive && (
@@ -132,7 +144,11 @@ const LobbyPage: React.FC = () => {
             <div className="grid min-h-screen w-full grid-cols-1 gap-6 p-4 md:grid-cols-2 md:gap-8 lg:gap-10">
                 <div className="flex flex-col rounded border bg-white shadow-sm dark:border-gray-800 dark:bg-[#0e0e0f]">
                     <div className="flex-1 p-6">
-                        <div className="grid h-full w-full grid-cols-8 grid-rows-8 gap-1"/>
+                        <div className="flex items-center h-full w-full justify-center gap-1">
+                            {/* Conditionally render the selected game */}
+                            {selectedGame === 'ticTacToe' && <Board/>}
+                            {selectedGame === 'chess' && <Chess/>}
+                        </div>
                     </div>
                 </div>
                 <div className="flex flex-col rounded border bg-white shadow-sm dark:border-gray-800 dark:bg-[#0e0e0f]">
@@ -142,15 +158,15 @@ const LobbyPage: React.FC = () => {
                                 className="flex-1 overflow-auto rounded-lg border bg-gray-100 p-4 dark:border-gray-800 dark:bg-[#0e0e0f]">
                                 <div className="grid gap-4">
                                     {/* Display lobby name and player count */}
-                                    <h1 className="text-2xl font-bold">Lobby: {lobby.name}</h1>
+                                    <h2 className="text-2xl font-bold">Lobby: {lobby.name} {lobby.playerIds}</h2>
                                     <p>Players: {lobby.players}/{lobby.maxPlayers}</p>
                                     <p>Max Players: {lobby.maxPlayers}</p>
                                     {/* Display messages */}
-                                    {messages.map(message => (
-                                        <div key={message.id} className="bg-gray-200 p-2 rounded">
-                                            {message.text}
-                                        </div>
-                                    ))}
+                                    <MessageDisplay messages={messages}/>
+                                    <div className="flex h-full w-full gap-4">
+                                        <Button onClick={() => handleGameChange('ticTacToe')}>Tic Tac Toe</Button>
+                                        <Button onClick={() => handleGameChange('chess')}>Chess</Button>
+                                    </div>
                                 </div>
                             </div>
                             <div className="grid gap-2">
