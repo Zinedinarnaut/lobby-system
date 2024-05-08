@@ -80,16 +80,16 @@ export default function privacyPolicy() {
             <main className="w-full max-w-[800px] mx-auto px-4 md:px-6 py-12 md:py-20">
                 <header className="mb-8 md:mb-12">
                     <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Privacy Policy</h1>
-                    <p className="text-white mt-2 text-lg">Last updated: 6/5/2024</p>
+                    <p className="text-white mt-2 text-lg">Last updated: 7/5/2024</p>
                 </header>
                 <section className="mb-10 md:mb-16">
                     <h2 className="text-2xl md:text-3xl font-bold mb-4">Data Collection</h2>
                     <p className="text-white leading-relaxed">
-                        We collect certain personal information from you, such as your name, email address, and any
+                        We collect certain personal information from you, such as your name, and any
                         other information
                         you provide to us directly. We may also collect information about your usage of our website or
                         services,
-                        including your IP address, browser type, and device information.
+                        including your IP address, browser type, and device information it may vary.
                     </p>
                 </section>
                 <section className="mb-10 md:mb-16">
@@ -99,7 +99,7 @@ export default function privacyPolicy() {
                         for other
                         legitimate business purposes. We will not sell or share your personal information with third
                         parties for their
-                        own marketing purposes without your consent.
+                        own marketing purposes without your consent (We will never give or sell your data).
                     </p>
                 </section>
                 <section className="mb-10 md:mb-16">
