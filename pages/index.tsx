@@ -1,103 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import LobbyList from '@/components/LobbyList';
-import LobbyForm from '@/components/LobbyForm';
-import {toast} from "sonner";
-import Link from 'next/link';
+import Link from "next/link"
+import { NavigationMenuLink, NavigationMenuItem, NavigationMenuList, NavigationMenu } from "@/components/ui/navigation-menu"
+import React, {JSX, SVGProps, useEffect, useState} from "react"
 import {Button} from "@/components/ui/button";
-import { DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem, DropdownMenuContent, DropdownMenu } from "@/components/ui/dropdown-menu"
-import Image from "next/image";
+import {toast} from "sonner";
 
-import MountainIcon from "@/components/MountainIcon"
-
-interface Lobby {
-  name: string;
-  players: number;
-  maxPlayers: number;
-  users: { id: string }[];
-}
-
-interface WebSocketMessage {
-  type: string;
-  lobbies?: Lobby[];
-  lobby?: Lobby;
-  message?: string;
-}
-
-interface WebSocketMessageWithCondition extends WebSocketMessage {
-  someCondition?: boolean;
-}
-
-const IndexPage: React.FC = () => {
-  const [lobbies, setLobbies] = useState<Lobby[]>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
+export default function Component() {
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080');
-    setWs(socket);
-
-    socket.onopen = () => {
-      console.log('Connected to WebSocket server');
-    };
-
-    socket.onmessage = (event: MessageEvent) => {
-      const data: WebSocketMessage = JSON.parse(event.data);
-      switch (data.type) {
-        case 'lobby_list':
-          if (data.lobbies) {
-            setLobbies(data.lobbies);
-          }
-          break;
-        case 'joined_lobby':
-          toast.success(`Joined lobby: ${data.lobby}`);
-          if (data.lobby) {
-            const newLobby: Lobby = {
-              name: data.lobby.name,
-              players: data.lobby.players,
-              maxPlayers: data.lobby.maxPlayers,
-              users: data.lobby.users
-            };
-            setLobbies(prevLobbies => [...prevLobbies, newLobby]);
-            const lobbyId = encodeURIComponent(data.lobby.name); // Assuming lobby ID is stored in data.lobby.id
-            router.push(`/lobby/${lobbyId}`);
-          }
-          break;
-        case 'left_lobby':
-          toast.warning(`Left lobby: ${data.message}`);
-          if (data.lobby) {
-            setLobbies(prevLobbies => prevLobbies.filter(lobby => lobby.name !== data.lobby!.name));
-          }
-          break;
-        case 'other_message_type':
-          console.log('Received other message:', data);
-          if ((data as WebSocketMessageWithCondition).someCondition) {
-            console.log('Performed some action');
-          } else {
-            console.log('Performed another action');
-          }
-          break;
-        default:
-          toast.warning(`Unknown message type: ${data.type}`);
-      }
-    };
-
-    socket.addEventListener('error', (event) => {
-      toast.error(`WebSocket error: ${event}`);
-    });
-
-    socket.addEventListener('close', () => {
-      toast.warning('WebSocket connection closed');
-    });
-
-    return () => {
-      if (ws) {
-        ws.close();
-      }
-    };
-  }, [router]);
-
   useEffect(() => {
     const fetchLatestVersion = async () => {
       try {
@@ -113,87 +21,135 @@ const IndexPage: React.FC = () => {
 
     fetchLatestVersion();
   }, []);
-
-  const handleCreateLobby = (lobbyData: { name: string, maxPlayers: number }) => {
-    if (ws) {
-      ws.send(JSON.stringify({ type: 'create_lobby', ...lobbyData }));
-    }
-  };
-
   return (
       <>
-        <header className="flex h-16 w-full items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-4">
-            <Link className="flex items-center gap-2 text-lg font-semibold" href="/">
-              <MountainIcon className="h-6 w-6"/>
-              <span className="sr-only">Acme Inc</span>
+        <header className="sticky top-0 z-50 bg-[#0e0e0f] shadow-sm dark:bg-[#0e0e0f] dark:text-gray-50">
+          <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+            <Link className="flex items-center gap-2 font-semibold" href="#">
+              <GamepadIcon className="h-6 w-6"/>
+              <span>Game Vault</span>
             </Link>
-            <nav className="hidden gap-6 text-sm font-medium md:flex">
-              <Link className="hover:underline hover:underline-offset-4" href="#">
-                Home
-              </Link>
-              <Link className="hover:underline hover:underline-offset-4" href="#">
-                Products
-              </Link>
-              <Link className="hover:underline hover:underline-offset-4" href="#">
-                Pricing
-              </Link>
-              <Link className="hover:underline hover:underline-offset-4" href="#">
-                About
-              </Link>
-              <Link className="hover:underline hover:underline-offset-4" href="/privacy-policy">
-                Privacy Policy
-              </Link>
-            </nav>
+            <NavigationMenu>
+              <NavigationMenuList className="flex items-center gap-4">
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <Link className="hover:underline" href="/lobbyCreation">
+                      Lobby Creation
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="rounded-full" size="icon" variant="ghost">
-                <Image
-                    alt="Avatar"
-                    className="rounded-full"
-                    height="32"
-                    quality={100}
-                    src="https://proclad-construction.vercel.app/api/v1/avatar/1"
-                    style={{
-                      aspectRatio: "32/32",
-                      objectFit: "cover",
-                    }}
-                    width="32"
-                />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Signed in as</DropdownMenuLabel>
-              <DropdownMenuSeparator/>
-              <DropdownMenuItem>
-                <Link href="#">Your Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="#">Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/privacy-policy">Privacy Policy</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator/>
-              <DropdownMenuItem>
-                <Link href="#">Login in</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </header>
-        <main className="flex min-h-screen w-full flex-col items-center justify-center py-12">
-          <div className="container mx-auto max-w-5xl px-4 md:px-6">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-              <LobbyList lobbies={lobbies}/>
-              <LobbyForm onCreate={(lobbyData: {
-                name: string,
-                players: number,
-                maxPlayers: number
-              }) => handleCreateLobby(lobbyData)}/>
+        <main>
+          <section className="w-full bg-gray-100 py-12 md:py-24 lg:py-32 dark:bg-[#0e0e0f]">
+            <div className="container flex flex-col items-center justify-center gap-4 px-4 text-center md:px-6">
+              <div className="space-y-3">
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Welcome to Game Vault</h1>
+                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+                  Discover a vast collection of the latest and greatest games. Explore, play, and immerse yourself in
+                  the
+                  ultimate gaming experience.
+                </p>
+              </div>
             </div>
-          </div>
+          </section>
+          <section className="w-full py-12 md:py-24 lg:py-32">
+            <div
+                className="container grid grid-cols-2 gap-4 px-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-8 md:px-6">
+              <Link className="group" href="#">
+                <div
+                    className="overflow-hidden rounded-lg bg-gray-100 transition-all duration-300 ease-in-out group-hover:scale-105 dark:bg-gray-800">
+                  <img
+                      alt="Game Thumbnail"
+                      className="aspect-[3/2] w-full object-cover"
+                      height="200"
+                      src="/placeholder.svg"
+                      width="300"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Cyberpunk 2077</h3>
+                  </div>
+                </div>
+              </Link>
+              <Link className="group" href="#">
+                <div
+                    className="overflow-hidden rounded-lg bg-gray-100 transition-all duration-300 ease-in-out group-hover:scale-105 dark:bg-gray-800">
+                  <img
+                      alt="Game Thumbnail"
+                      className="aspect-[3/2] w-full object-cover"
+                      height="200"
+                      src="/placeholder.svg"
+                      width="300"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">The Witcher 3</h3>
+                  </div>
+                </div>
+              </Link>
+              <Link className="group" href="#">
+                <div
+                    className="overflow-hidden rounded-lg bg-gray-100 transition-all duration-300 ease-in-out group-hover:scale-105 dark:bg-gray-800">
+                  <img
+                      alt="Game Thumbnail"
+                      className="aspect-[3/2] w-full object-cover"
+                      height="200"
+                      src="/placeholder.svg"
+                      width="300"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Red Dead Redemption 2</h3>
+                  </div>
+                </div>
+              </Link>
+              <Link className="group" href="#">
+                <div
+                    className="overflow-hidden rounded-lg bg-gray-100 transition-all duration-300 ease-in-out group-hover:scale-105 dark:bg-gray-800">
+                  <img
+                      alt="Game Thumbnail"
+                      className="aspect-[3/2] w-full object-cover"
+                      height="200"
+                      src="/placeholder.svg"
+                      width="300"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Elden Ring</h3>
+                  </div>
+                </div>
+              </Link>
+              <Link className="group" href="#">
+                <div
+                    className="overflow-hidden rounded-lg bg-gray-100 transition-all duration-300 ease-in-out group-hover:scale-105 dark:bg-gray-800">
+                  <img
+                      alt="Game Thumbnail"
+                      className="aspect-[3/2] w-full object-cover"
+                      height="200"
+                      src="/placeholder.svg"
+                      width="300"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">God of War</h3>
+                  </div>
+                </div>
+              </Link>
+              <Link className="group" href="#">
+                <div
+                    className="overflow-hidden rounded-lg bg-gray-100 transition-all duration-300 ease-in-out group-hover:scale-105 dark:bg-gray-800">
+                  <img
+                      alt="Game Thumbnail"
+                      className="aspect-[3/2] w-full object-cover"
+                      height="200"
+                      src="/placeholder.svg"
+                      width="300"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Horizon Zero Dawn</h3>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          </section>
         </main>
         <footer
             className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
@@ -211,11 +167,37 @@ const IndexPage: React.FC = () => {
             <Link className="text-xs hover:underline underline-offset-4" href="/privacy-policy">
               Privacy Policy
             </Link>
+            <Link className="text-xs hover:underline underline-offset-4" href="/lobbyCreation">
+              Lobby Creation
+            </Link>
           </nav>
         </footer>
       </>
-  );
-};
+  )
+}
+
+function GamepadIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+  return (
+      <svg
+          {...props}
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+      >
+        <line x1="6" x2="10" y1="12" y2="12"/>
+        <line x1="8" x2="8" y1="10" y2="14"/>
+        <line x1="15" x2="15.01" y1="13" y2="13"/>
+        <line x1="18" x2="18.01" y1="11" y2="11"/>
+        <rect width="20" height="12" x="2" y="6" rx="2"/>
+      </svg>
+  )
+}
 
 function CircleIcon(props: React.JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) {
   return (
@@ -235,5 +217,3 @@ function CircleIcon(props: React.JSX.IntrinsicAttributes & React.SVGProps<SVGSVG
       </svg>
   )
 }
-
-export default IndexPage;

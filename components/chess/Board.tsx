@@ -10,7 +10,7 @@ interface BProps {
 
 function Board ({boardPieces, handleClick, moves} : BProps) {
     return (
-        <div className={"flex flex-col items-center justify-center border-gray-400 border-2"}>
+        <div className={"flex flex-col items-center rounded justify-center border-gray-800 border"}>
             {boardPieces.map((row, rowIdx)=> {
                 return (
                     <div key={rowIdx} className={"row flex"}>

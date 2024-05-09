@@ -15,7 +15,7 @@ export interface PProps {
 }
 
 function Piece ({typ, team, size}: PProps) {
-    const teamClass = team === "white" ? "text-gray-300" : team === "black" ? "text-black" : "text-transparent"
+    const teamClass = team === "white" ? "text-gray-300" : team === "black" ? "text-[#E3B914]" : "text-transparent"
     return(
         <div className={""}>
             <FontAwesomeIcon

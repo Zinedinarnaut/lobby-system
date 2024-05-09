@@ -10,7 +10,7 @@ interface LPProps {
 }
 
 function LostPieces ({team, pieces}: LPProps) {
-    const color = team === "white" ? "text-gray-300" : "text-black";
+    const color = team === "white" ? "text-gray-300" : "text-[#E3B914]";
     return (
         <div className={`container ${color} text-center`}>
 {/*            <div className={"py-4"}>

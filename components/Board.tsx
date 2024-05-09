@@ -46,13 +46,14 @@ function Board () {
     function reset(){
         setSquares(Array(9).fill(null));
         setWinner(null);
-        setCurrentPlayer(Math.round(Math.random() * 1) === 1 ? 'X' : 'O')
+        setCurrentPlayer(Math.round(Math.random()) === 1 ? 'X' : 'O')
     }
 
     useEffect(()=>{
         const w = calculateWinner(squares);
         if(w){
             setWinner(w)
+            toast.success(`Winner is ${w}`)
         }
         if(!w && !squares.filter((square)=> !square).length){
             setWinner("Both")
