@@ -5,7 +5,7 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 const lobbies = [];
 
-const discordWebhookUrl = 'https://discord.com/api/webhooks/1232250462921818142/KawJWWUiV0W4UOeRCVzRGojpC7XTwgODfwnhmYdQr1L5GashdEScjDNwJx4NEEFI-jhw';
+const discordWebhookUrl = '';
 
 // Function to log messages to Discord webhook
 function logToDiscord(message, retries = 3) {
